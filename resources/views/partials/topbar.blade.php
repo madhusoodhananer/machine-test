@@ -8,13 +8,7 @@
         <h1 class="hi-page-title">@yield('title', 'Dashboard')</h1>
     </div>
 
-    <div class="hi-search d-none d-sm-block ms-auto">
-        <i class="bi bi-search"></i>
-        <input class="form-control" type="search" placeholder="Search hotels, rooms…" aria-label="Search"
-               onkeydown="if(event.key==='Enter'){window.location='{{ route('search.index') }}?city='+encodeURIComponent(this.value);}">
-    </div>
-
-    <button class="hi-icon-btn" type="button" title="Notifications" data-bs-toggle="modal" data-bs-target="#comingSoonModal">
+    <button class="hi-icon-btn ms-auto" type="button" title="Notifications" data-bs-toggle="modal" data-bs-target="#comingSoonModal">
         <i class="bi bi-bell"></i><span class="hi-dot"></span>
     </button>
 
