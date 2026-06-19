@@ -18,31 +18,26 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        try {
-            $credentials = $request->credentials();
+        $credentials = $request->credentials();
 
-            /** @var User|null $user */
-            $user = User::query()->where('email', $credentials['email'])->first();
+        /** @var User|null $user */
+        $user = User::query()->where('email', $credentials['email'])->first();
 
-            if ($user === null || ! Hash::check($credentials['password'], $user->password)) {
-                return $this->respondError('The provided credentials are incorrect.', 401);
-            }
-
-            $token = $user->createToken('api-token')->plainTextToken;
-
-            return response()->json([
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
-            ]);
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return $this->respondError('Unable to sign in right now.', 500);
+        // A deliberate guard (not an error): wrong credentials are a 401, not a 500.
+        if ($user === null || ! Hash::check($credentials['password'], $user->password)) {
+            return $this->respondError('The provided credentials are incorrect.', 401);
         }
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ]);
     }
 
     /**
@@ -50,18 +45,12 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        try {
-            $token = $request->user()?->currentAccessToken();
+        $token = $request->user()?->currentAccessToken();
 
-            if ($token !== null) {
-                $token->delete();
-            }
-
-            return $this->respondNoContent();
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return $this->respondError('Unable to sign out right now.', 500);
+        if ($token !== null) {
+            $token->delete();
         }
+
+        return $this->respondNoContent();
     }
 }

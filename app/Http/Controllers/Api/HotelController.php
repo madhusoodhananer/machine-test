@@ -22,24 +22,18 @@ class HotelController extends Controller
     /**
      * GET /api/hotels — paginated, filterable list.
      */
-    public function index(Request $request): AnonymousResourceCollection|JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
-        try {
-            $filters = [
-                'city' => $request->query('city'),
-                'rating' => $request->query('rating'),
-            ];
+        $filters = [
+            'city' => $request->query('city'),
+            'rating' => $request->query('rating'),
+        ];
 
-            $perPage = $request->integer('per_page', 15);
+        $perPage = $request->integer('per_page', 15);
 
-            return HotelResource::collection(
-                $this->hotels->paginate($filters, $perPage > 0 ? $perPage : 15),
-            );
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return $this->respondError('Unable to load hotels right now.', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return HotelResource::collection(
+            $this->hotels->paginate($filters, $perPage > 0 ? $perPage : 15),
+        );
     }
 
     /**
@@ -47,16 +41,10 @@ class HotelController extends Controller
      */
     public function store(StoreHotelRequest $request): JsonResponse
     {
-        try {
-            $hotel = $this->hotels->create($request->validated());
+        $hotel = $this->hotels->create($request->validated());
 
-            return (new HotelResource($hotel))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return $this->respondError('Unable to create the hotel right now.', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return (new HotelResource($hotel))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 }

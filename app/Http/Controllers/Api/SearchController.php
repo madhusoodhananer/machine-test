@@ -8,9 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SearchRequest;
 use App\Http\Resources\SearchResultResource;
 use App\Services\SearchService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
 
 class SearchController extends Controller
 {
@@ -21,17 +19,11 @@ class SearchController extends Controller
     /**
      * GET /api/search — available hotels/rooms for a city and date range.
      */
-    public function __invoke(SearchRequest $request): AnonymousResourceCollection|JsonResponse
+    public function __invoke(SearchRequest $request): AnonymousResourceCollection
     {
-        try {
-            $result = $this->search->search($request->searchParams());
+        $result = $this->search->search($request->searchParams());
 
-            return SearchResultResource::collection($result['results'])
-                ->additional(['meta' => $result['meta']]);
-        } catch (\Throwable $exception) {
-            report($exception);
-
-            return $this->respondError('Unable to run the search right now.', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return SearchResultResource::collection($result['results'])
+            ->additional(['meta' => $result['meta']]);
     }
 }

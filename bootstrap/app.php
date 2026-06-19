@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\ApiExceptionRenderer;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,5 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
+        );
+
+        // One place maps every exception type to a consistent API JSON shape.
+        $exceptions->render(
+            fn (Throwable $e, Request $request) => app(ApiExceptionRenderer::class)->render($e, $request),
         );
     })->create();
