@@ -21,23 +21,39 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): RedirectResponse
     {
-        if (! Auth::attempt($request->credentials(), $request->boolean('remember'))) {
-            throw ValidationException::withMessages([
-                'email' => __('These credentials do not match our records.'),
-            ]);
+        try {
+            if (! Auth::attempt($request->credentials(), $request->boolean('remember'))) {
+                throw ValidationException::withMessages([
+                    'email' => __('These credentials do not match our records.'),
+                ]);
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->intended('/dashboard');
+        } catch (ValidationException $exception) {
+            // Surface invalid-credential messages inline on the login form.
+            throw $exception;
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->withInput($request->only('email'))
+                ->with('error', 'We could not sign you in. Please try again.');
         }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended('/dashboard');
     }
 
     public function logout(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        try {
+            Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
 
         return redirect('/login');
     }

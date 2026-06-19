@@ -20,11 +20,24 @@ class DashboardController extends Controller
 
     public function index(): View
     {
-        return view('dashboard', [
-            'totalHotels' => $this->hotels->count(),
-            'totalRooms' => $this->rooms->count(),
-            'totalBookings' => $this->bookings->count(),
-            'averageRating' => $this->hotels->averageRating(),
-        ]);
+        try {
+            return view('dashboard', [
+                'totalHotels' => $this->hotels->count(),
+                'totalRooms' => $this->rooms->count(),
+                'totalBookings' => $this->bookings->count(),
+                'averageRating' => $this->hotels->averageRating(),
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            session()->now('error', 'We could not load all dashboard metrics.');
+
+            return view('dashboard', [
+                'totalHotels' => 0,
+                'totalRooms' => 0,
+                'totalBookings' => 0,
+                'averageRating' => 0.0,
+            ]);
+        }
     }
 }

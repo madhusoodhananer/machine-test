@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SearchRequest;
 use App\Services\SearchService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SearchController extends Controller
@@ -25,18 +26,27 @@ class SearchController extends Controller
         $results = null;
         $meta = null;
 
-        if ($request->hasAny(['city', 'checkin_date', 'checkout_date', 'guests'])) {
-            $validated = $request->validate((new SearchRequest)->rules());
+        try {
+            if ($request->hasAny(['city', 'checkin_date', 'checkout_date', 'guests'])) {
+                $validated = $request->validate((new SearchRequest)->rules());
 
-            $payload = $this->search->search([
-                'city' => $validated['city'],
-                'checkin_date' => $validated['checkin_date'],
-                'checkout_date' => $validated['checkout_date'],
-                'guests' => (int) $validated['guests'],
-            ]);
+                $payload = $this->search->search([
+                    'city' => $validated['city'],
+                    'checkin_date' => $validated['checkin_date'],
+                    'checkout_date' => $validated['checkout_date'],
+                    'guests' => (int) $validated['guests'],
+                ]);
 
-            $results = $payload['results'];
-            $meta = $payload['meta'];
+                $results = $payload['results'];
+                $meta = $payload['meta'];
+            }
+        } catch (ValidationException $exception) {
+            // Let validation errors surface inline on the form.
+            throw $exception;
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            session()->now('error', 'We could not complete the search. Please try again.');
         }
 
         return view('search.index', [

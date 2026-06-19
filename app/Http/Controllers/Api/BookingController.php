@@ -28,12 +28,16 @@ class BookingController extends Controller
 
         try {
             $booking = $this->bookings->create($data);
+
+            return (new BookingResource($booking))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
         } catch (RoomNotAvailableException $exception) {
             return $this->respondError($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
+        } catch (\Throwable $exception) {
+            report($exception);
 
-        return (new BookingResource($booking))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+            return $this->respondError('Unable to create the booking right now.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

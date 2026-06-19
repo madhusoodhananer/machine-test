@@ -22,10 +22,16 @@ class RoomController extends Controller
      */
     public function store(StoreRoomRequest $request): JsonResponse
     {
-        $room = $this->rooms->create($request->validated());
+        try {
+            $room = $this->rooms->create($request->validated());
 
-        return (new RoomResource($room->load('hotel')))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+            return (new RoomResource($room->load('hotel')))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return $this->respondError('Unable to create the room right now.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
