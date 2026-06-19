@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Exceptions\ResourceInUseException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoomRequest;
 use App\Models\Room;
@@ -83,6 +84,27 @@ class RoomController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', 'We could not update the room. Please try again.');
+        }
+    }
+
+    public function destroy(Room $room): RedirectResponse
+    {
+        try {
+            $this->rooms->delete($room);
+
+            return redirect()
+                ->route('rooms.index')
+                ->with('status', 'Room deleted successfully.');
+        } catch (ResourceInUseException $exception) {
+            return redirect()
+                ->back()
+                ->with('error', $exception->getMessage());
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->with('error', 'We could not delete the room. Please try again.');
         }
     }
 }

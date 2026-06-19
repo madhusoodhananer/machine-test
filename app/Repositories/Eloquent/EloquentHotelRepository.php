@@ -23,6 +23,11 @@ class EloquentHotelRepository implements HotelRepositoryInterface
         return $hotel;
     }
 
+    public function delete(Hotel $hotel): void
+    {
+        $hotel->delete();
+    }
+
     public function paginate(array $filters, int $perPage): LengthAwarePaginator
     {
         return Hotel::query()

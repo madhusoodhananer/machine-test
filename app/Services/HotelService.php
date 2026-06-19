@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\ResourceInUseException;
 use App\Models\Hotel;
 use App\Repositories\Contracts\HotelRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -29,6 +30,22 @@ class HotelService
     public function update(Hotel $hotel, array $attributes): Hotel
     {
         return $this->hotels->update($hotel, $attributes);
+    }
+
+    /**
+     * Delete a hotel — only when it has no rooms.
+     *
+     * @throws ResourceInUseException when the hotel still has rooms.
+     */
+    public function delete(Hotel $hotel): void
+    {
+        $roomCount = $hotel->rooms()->count();
+
+        if ($roomCount > 0) {
+            throw ResourceInUseException::hotelHasRooms($roomCount);
+        }
+
+        $this->hotels->delete($hotel);
     }
 
     /**

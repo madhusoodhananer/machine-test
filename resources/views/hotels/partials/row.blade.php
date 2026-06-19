@@ -52,6 +52,16 @@
                         <i class="bi bi-pencil me-2"></i>Edit
                     </button>
                 </li>
+                <li>
+                    <button type="button" class="dropdown-item text-danger"
+                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-action="{{ route('hotels.destroy', $hotel->id) }}"
+                            data-title="Delete hotel?"
+                            data-message="This removes the hotel. A hotel that still has rooms can't be deleted."
+                            data-summary="{{ $hotel->name }} · {{ $hotel->city }}, {{ $hotel->country }}">
+                        <i class="bi bi-trash me-2"></i>Delete
+                    </button>
+                </li>
             </ul>
         </div>
     </td>

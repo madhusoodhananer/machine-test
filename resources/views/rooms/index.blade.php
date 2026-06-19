@@ -71,6 +71,7 @@
     @include('rooms.partials.create-modal')
     @include('rooms.partials.edit-modal')
     @include('rooms.partials.details-modal')
+    @include('partials.confirm-delete-modal')
 
     @if ($errors->any())
         @push('scripts')

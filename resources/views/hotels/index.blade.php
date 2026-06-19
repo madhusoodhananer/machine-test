@@ -50,6 +50,7 @@
     @include('hotels.partials.create-modal')
     @include('hotels.partials.edit-modal')
     @include('hotels.partials.details-modal')
+    @include('partials.confirm-delete-modal')
 
     @if ($errors->any())
         @push('scripts')

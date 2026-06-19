@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Exceptions\ResourceInUseException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHotelRequest;
 use App\Models\Hotel;
@@ -78,6 +79,27 @@ class HotelController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', 'We could not update the hotel. Please try again.');
+        }
+    }
+
+    public function destroy(Hotel $hotel): RedirectResponse
+    {
+        try {
+            $this->hotels->delete($hotel);
+
+            return redirect()
+                ->route('hotels.index')
+                ->with('status', 'Hotel deleted successfully.');
+        } catch (ResourceInUseException $exception) {
+            return redirect()
+                ->back()
+                ->with('error', $exception->getMessage());
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->with('error', 'We could not delete the hotel. Please try again.');
         }
     }
 }

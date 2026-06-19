@@ -20,6 +20,11 @@ interface RoomRepositoryInterface
      */
     public function update(Room $room, array $attributes): Room;
 
+    /**
+     * Soft-delete a room.
+     */
+    public function delete(Room $room): void;
+
     public function find(string $id): ?Room;
 
     /**

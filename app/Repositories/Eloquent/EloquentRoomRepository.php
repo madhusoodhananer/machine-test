@@ -23,6 +23,11 @@ class EloquentRoomRepository implements RoomRepositoryInterface
         return $room;
     }
 
+    public function delete(Room $room): void
+    {
+        $room->delete();
+    }
+
     public function find(string $id): ?Room
     {
         return Room::query()->find($id);

@@ -27,10 +27,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/hotels', [HotelController::class, 'index'])->name('hotels.index');
     Route::post('/hotels', [HotelController::class, 'store'])->name('hotels.store');
     Route::put('/hotels/{hotel}', [HotelController::class, 'update'])->name('hotels.update');
+    Route::delete('/hotels/{hotel}', [HotelController::class, 'destroy'])->name('hotels.destroy');
 
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
     Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
+    Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');

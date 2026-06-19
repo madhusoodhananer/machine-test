@@ -21,6 +21,11 @@ interface HotelRepositoryInterface
     public function update(Hotel $hotel, array $attributes): Hotel;
 
     /**
+     * Soft-delete a hotel.
+     */
+    public function delete(Hotel $hotel): void;
+
+    /**
      * Paginate hotels applying optional filters.
      *
      * @param  array{city?: string|null, rating?: int|null}  $filters
