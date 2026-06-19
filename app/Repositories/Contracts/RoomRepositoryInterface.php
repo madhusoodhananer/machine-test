@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Repositories\Contracts;
+
+use App\Models\Room;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+interface RoomRepositoryInterface
+{
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function create(array $attributes): Room;
+
+    public function find(int $id): ?Room;
+
+    /**
+     * Find a room for update inside a transaction (row lock) — used to
+     * prevent overbooking races when creating a booking.
+     */
+    public function findForUpdate(int $id): ?Room;
+
+    /**
+     * Paginate rooms with their hotel eager-loaded (for the rooms listing page).
+     *
+     * @return LengthAwarePaginator<int, Room>
+     */
+    public function paginateWithHotel(int $perPage): LengthAwarePaginator;
+
+    public function count(): int;
+}
