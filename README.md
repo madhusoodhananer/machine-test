@@ -19,20 +19,24 @@ the exact same service layer — no duplicated business logic.
 - **Form Request validation**, **API Resources**, correct **HTTP status codes**.
 - **Cached search** with version-based invalidation that survives the file/array cache driver.
 - **Rate limiting**, **overbooking-safe** booking writes (transaction + row lock).
-- **21 tests** (unit + feature) green on SQLite in-memory.
+- **UUID v4** primary keys, **soft deletes**, and an **audit trail** (`created_by` / `updated_by` /
+  `deleted_by`) on every inventory table via a shared base model.
+- **25 tests** (unit + feature) green on SQLite in-memory.
 
 ---
 
 ## Tech stack
 
-| Concern        | Choice                                            |
-|----------------|---------------------------------------------------|
-| Framework      | Laravel 13 (PHP 8.3+)                              |
-| Auth           | Laravel Sanctum (tokens for API, session for web) |
-| Database       | MySQL 8 (Docker); SQLite for the test suite       |
-| Frontend       | Blade + Bootstrap 5 (CDN)                          |
-| Cache          | Redis in Docker; file/array locally               |
-| Code style     | PSR-12 via Laravel Pint                            |
+| Concern        | Choice                                                      |
+|----------------|-------------------------------------------------------------|
+| Framework      | Laravel 13 (PHP 8.4)                                         |
+| Auth           | Laravel Sanctum (tokens for API, session for web)           |
+| Database       | MySQL 8 (host or Sail); SQLite in-memory for the test suite |
+| Keys           | UUID v4 primary keys + soft deletes + audit columns         |
+| Frontend       | Blade + Bootstrap 5, Tom Select & Bootstrap Icons (CDN)     |
+| Cache          | Redis in Sail; database/file driver locally                 |
+| Container      | Laravel Sail (Docker)                                       |
+| Code style     | PSR-12 via Laravel Pint                                      |
 
 ---
 
@@ -69,12 +73,13 @@ app/
 
 ## Design note — date-aware availability (important)
 
-The original brief ships a static `rooms.available_rooms` integer, but search takes
-check-in/check-out dates and a static count cannot express *availability for a date range*.
-We intentionally implemented the **production-correct** version:
+The brief models availability as a static `rooms.available_rooms` integer, which is a clean
+and simple starting point. Since search accepts check-in/check-out dates, I extended that idea
+so availability can be expressed **for a specific date range** rather than as a single number.
+This keeps the brief's intent and adds date-awareness on top:
 
-- `rooms.total_rooms` holds the **physical inventory** of a room type (this replaces the static
-  `available_rooms` column).
+- `rooms.total_rooms` holds the **physical inventory** of a room type (the date-aware count is
+  derived from this instead of being stored directly).
 - A `bookings` table records each confirmed reservation (`room_id`, `checkin_date`,
   `checkout_date`, `guests`, `status`, `total_price`).
 - Availability is **derived per requested range**, never stored.
@@ -116,37 +121,134 @@ results are orphaned and recomputed on the next request (they also expire natura
 
 ---
 
-## Getting started — local (quickest)
+There are two supported ways to run the app:
 
-Requires PHP 8.3+ and Composer. Uses SQLite so no database server is needed.
+1. **Normal (no Docker)** — host PHP + a MySQL server you already run locally.
+2. **Sail (Docker)** — everything (PHP 8.4, MySQL 8, Redis) in containers.
+
+Both end at the same place: the web UI at the printed URL and the JSON API under `/api`.
+
+---
+
+## Getting started — Normal (no Docker)
+
+Run directly on your machine. Good when you already have PHP and a MySQL server (e.g. Herd,
+DBngin, or a local Docker MySQL) listening on `127.0.0.1:3306`.
+
+**Requirements**
+
+- PHP **8.4** with the usual Laravel extensions (`pdo_mysql`, `mbstring`, `openssl`, `bcmath`,
+  `ctype`, `fileinfo`, `tokenizer`, `xml`).
+- Composer 2.
+- A reachable **MySQL 8** server and credentials.
+
+**1 — Install dependencies and create the env file**
 
 ```bash
 composer install
-cp -n .env.example .env          # already SQLite by default
+cp -n .env.example .env
 php artisan key:generate
-touch database/database.sqlite
-php artisan migrate --seed
-php artisan serve                # http://127.0.0.1:8000
 ```
 
-Log in at `/login` with the seeded admin (below).
+**2 — Point `.env` at your MySQL server**
 
-## Getting started — Docker
+`.env.example` defaults to SQLite. For the normal MySQL run, set these keys in `.env`
+(use your own MySQL username and password):
 
-Brings up `app` (PHP-FPM), `nginx` (port **8080**), `mysql` 8, and `redis`.
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_hotel
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+> Prefer zero setup? Leave `.env.example`'s `DB_CONNECTION=sqlite`, then
+> `touch database/database.sqlite` and skip the database-creation step below.
+
+**3 — Create the database (once)**
 
 ```bash
-docker compose up -d --build
-docker compose exec app cp -n .env.example .env
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --seed
-# open http://localhost:8080
+mysql -h 127.0.0.1 -P 3306 -u root -p -e "CREATE DATABASE IF NOT EXISTS db_hotel"
 ```
 
-A `Makefile` wraps these: `make up`, `make setup`, `make test`, `make pint`.
+**4 — Migrate, seed, and serve**
 
-> The `app` service injects `DB_*`/`REDIS_*`/`CACHE_STORE` env vars pointing at the `mysql` and
-> `redis` containers, so the committed `.env` (SQLite) is overridden inside Docker.
+```bash
+php artisan config:clear
+php artisan migrate:fresh --seed
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Open **http://127.0.0.1:8000** and log in at `/login` with the seeded admin (below).
+
+---
+
+## Getting started — Sail (Docker)
+
+Laravel Sail brings up three containers defined in `docker-compose.yml`:
+
+| Service        | Image                  | Purpose                  | Host port (from `.env`) |
+|----------------|------------------------|--------------------------|-------------------------|
+| `laravel.test` | `sail-8.4/app`         | PHP 8.4 app server       | `APP_PORT` → **8088**   |
+| `mysql`        | `mysql/mysql-server:8` | MySQL 8 database         | `FORWARD_DB_PORT` → **3307** |
+| `redis`        | `redis:alpine`         | Cache / queue            | `FORWARD_REDIS_PORT` → **6380** |
+
+The host ports are forwarded (8088/3307/6380) so they don't clash with a MySQL/Redis you may
+already run on the standard ports.
+
+**1 — Create the env file**
+
+```bash
+cp -n .env.example .env
+```
+
+Make sure these keys are set for Sail (the committed `.env` already uses them):
+
+```dotenv
+APP_PORT=8088
+DB_CONNECTION=mysql
+DB_HOST=mysql            # the service name inside the Docker network
+DB_PORT=3306
+DB_DATABASE=db_hotel
+DB_USERNAME=sail
+DB_PASSWORD=password
+FORWARD_DB_PORT=3307
+FORWARD_REDIS_PORT=6380
+```
+
+> `DB_HOST=mysql` resolves **inside** the Docker network. From your host shell that name does
+> not resolve — that's why artisan/migrate commands below run **through** Sail
+> (`./vendor/bin/sail artisan ...`), not directly.
+
+**2 — Build and start the containers**
+
+```bash
+./vendor/bin/sail up -d --build
+```
+
+**3 — Key, migrate, and seed (inside the container)**
+
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+
+Open **http://localhost:8088** and log in at `/login`.
+
+**Handy Sail commands**
+
+```bash
+./vendor/bin/sail artisan test       # run the test suite
+./vendor/bin/sail artisan tinker     # REPL
+./vendor/bin/sail mysql              # mysql shell on the db container
+./vendor/bin/sail down               # stop and remove containers
+```
+
+> A short-alias tip: `alias sail='./vendor/bin/sail'` lets you drop the `./vendor/bin/` prefix.
+
+---
 
 ### Seeded credentials
 
@@ -178,7 +280,8 @@ Base prefix `/api`, JSON only. Protected routes need `Authorization: Bearer <tok
 ### Example — search
 
 ```bash
-curl "http://localhost:8080/api/search?city=Dubai&checkin_date=2026-07-01&checkout_date=2026-07-04&guests=2" \
+# Sail: port 8088 · Normal run: port 8000
+curl "http://localhost:8088/api/search?city=Dubai&checkin_date=2026-07-01&checkout_date=2026-07-04&guests=2" \
   -H "Accept: application/json"
 ```
 
@@ -186,16 +289,18 @@ curl "http://localhost:8080/api/search?city=Dubai&checkin_date=2026-07-01&checko
 {
   "data": [
     {
-      "hotel": { "id": 1, "name": "Burj Marina Resort", "city": "Dubai", "country": "United Arab Emirates", "rating": 5 },
+      "hotel": { "id": "9b1c…uuid", "name": "Burj Marina Resort", "city": "Dubai", "country": "United Arab Emirates", "rating": 5 },
       "nights": 3,
       "rooms": [
-        { "id": 1, "name": "Deluxe King", "price_per_night": "220.00", "max_occupancy": 2, "available_units": 5, "total_price": "660.00" }
+        { "id": "7f2a…uuid", "name": "Deluxe King", "price_per_night": "220.00", "max_occupancy": 2, "available_units": 5, "total_price": "660.00" }
       ]
     }
   ],
   "meta": { "checkin_date": "2026-07-01", "checkout_date": "2026-07-04", "guests": 2, "nights": 3 }
 }
 ```
+
+> IDs are **UUID v4** strings (not integers).
 
 ---
 
@@ -205,21 +310,30 @@ curl "http://localhost:8080/api/search?city=Dubai&checkin_date=2026-07-01&checko
 |--------------|---------------------------------------------------------|
 | `/login`     | Session login form with inline validation               |
 | `/dashboard` | Stats: total hotels, rooms, bookings, average rating    |
-| `/hotels`    | Add hotel form + filterable, paginated list             |
-| `/rooms`     | Add room form (hotel dropdown) + room list              |
+| `/hotels`    | Add/edit/delete hotels (modals) + searchable city filter + paginated list |
+| `/rooms`     | Add/edit/delete rooms (searchable hotel dropdown) + search + pagination    |
+| `/bookings`  | Create/delete bookings with validation + paginated list |
 | `/search`    | Availability search form + results with totals          |
+
+Deletes are dependency-checked: a hotel with rooms, or a room with bookings, cannot be
+removed and the UI shows a clear message instead.
 
 ---
 
 ## Tests
 
 ```bash
-php artisan test
+php artisan test                 # normal run (host)
+./vendor/bin/sail artisan test   # inside Sail
 ```
 
-21 tests covering the availability algorithm (no bookings, fully booked, partial overlap,
+The suite always runs on **SQLite in-memory** (configured in `phpunit.xml`), so it never
+touches your MySQL data and needs no database setup.
+
+25 tests covering the availability algorithm (no bookings, fully booked, partial overlap,
 half-open checkout day, occupancy filtering, pricing), auth (web redirect, API token,
-401 on protected routes), and the booking flow (creation, 422 when full, cache invalidation).
+401 on protected routes), the booking flow (creation, 422 when full, cache invalidation),
+and the audit-trail / soft-delete behaviour on the base model.
 
 Code style:
 
