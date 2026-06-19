@@ -277,6 +277,29 @@ Base prefix `/api`, JSON only. Protected routes need `Authorization: Bearer <tok
 
 **Rate limits:** `throttle:60,1` across the API group, `throttle:10,1` on `POST /api/login`.
 
+### Example — login & logout
+
+```bash
+# Log in — returns { token, user }
+curl -X POST http://localhost:8000/api/login \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password"}'
+
+# Capture the token in one go, then reuse it on protected routes
+TOKEN=$(curl -s -X POST http://localhost:8000/api/login \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password"}' \
+  | php -r 'echo json_decode(stream_get_contents(STDIN), true)["token"];')
+
+# Log out — revokes the current token, returns 204 No Content
+curl -X POST http://localhost:8000/api/logout \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+> Use port **8088** instead of 8000 when running via Sail.
+
 ### Example — search
 
 ```bash
