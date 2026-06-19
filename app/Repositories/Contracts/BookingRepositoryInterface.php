@@ -21,8 +21,8 @@ interface BookingRepositoryInterface
      * grouped by room_id. Overlap rule (half-open intervals):
      *   existing.checkin < requested.checkout AND existing.checkout > requested.checkin
      *
-     * @param  list<int>  $roomIds
-     * @return Collection<int, Collection<int, Booking>>
+     * @param  list<string>  $roomIds
+     * @return Collection<string, Collection<int, Booking>>
      */
     public function overlappingForRooms(array $roomIds, string $checkin, string $checkout): Collection;
 
@@ -33,5 +33,5 @@ interface BookingRepositoryInterface
      *
      * @return Collection<int, Booking>
      */
-    public function overlappingForRoom(int $roomId, string $checkin, string $checkout, bool $lock = false): Collection;
+    public function overlappingForRoom(string $roomId, string $checkin, string $checkout, bool $lock = false): Collection;
 }

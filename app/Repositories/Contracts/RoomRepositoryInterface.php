@@ -14,13 +14,13 @@ interface RoomRepositoryInterface
      */
     public function create(array $attributes): Room;
 
-    public function find(int $id): ?Room;
+    public function find(string $id): ?Room;
 
     /**
      * Find a room for update inside a transaction (row lock) — used to
      * prevent overbooking races when creating a booking.
      */
-    public function findForUpdate(int $id): ?Room;
+    public function findForUpdate(string $id): ?Room;
 
     /**
      * Paginate rooms with their hotel eager-loaded (for the rooms listing page).

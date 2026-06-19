@@ -56,7 +56,6 @@ class SearchService
 
         $roomIds = $hotels
             ->flatMap(fn (Hotel $hotel) => $hotel->rooms->pluck('id'))
-            ->map(fn ($id): int => (int) $id)
             ->values()
             ->all();
 

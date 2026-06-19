@@ -34,7 +34,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
             ->groupBy('room_id');
     }
 
-    public function overlappingForRoom(int $roomId, string $checkin, string $checkout, bool $lock = false): Collection
+    public function overlappingForRoom(string $roomId, string $checkin, string $checkout, bool $lock = false): Collection
     {
         return Booking::query()
             ->where('room_id', $roomId)

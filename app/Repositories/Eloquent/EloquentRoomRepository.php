@@ -15,12 +15,12 @@ class EloquentRoomRepository implements RoomRepositoryInterface
         return Room::query()->create($attributes);
     }
 
-    public function find(int $id): ?Room
+    public function find(string $id): ?Room
     {
         return Room::query()->find($id);
     }
 
-    public function findForUpdate(int $id): ?Room
+    public function findForUpdate(string $id): ?Room
     {
         return Room::query()->lockForUpdate()->find($id);
     }
@@ -29,7 +29,7 @@ class EloquentRoomRepository implements RoomRepositoryInterface
     {
         return Room::query()
             ->with('hotel')
-            ->latest('id')
+            ->latest() // newest first by created_at (UUID keys are not time-ordered)
             ->paginate($perPage);
     }
 

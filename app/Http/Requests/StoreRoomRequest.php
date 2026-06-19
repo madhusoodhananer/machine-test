@@ -19,7 +19,7 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'hotel_id' => ['required', 'integer', 'exists:hotels,id'],
+            'hotel_id' => ['required', 'uuid', 'exists:hotels,id'],
             'name' => ['required', 'string', 'max:255'],
             'price_per_night' => ['required', 'numeric', 'min:0'],
             'max_occupancy' => ['required', 'integer', 'min:1'],

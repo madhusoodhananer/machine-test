@@ -4,16 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Database\Factories\BookingFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Booking extends Model
+class Booking extends AppModel
 {
-    /** @use HasFactory<BookingFactory> */
-    use HasFactory;
-
     public const string STATUS_CONFIRMED = 'confirmed';
 
     public const string STATUS_CANCELLED = 'cancelled';

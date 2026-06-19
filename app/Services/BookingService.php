@@ -52,7 +52,7 @@ class BookingService
      * Create a confirmed booking, guarding against overbooking with a row lock
      * inside a transaction. Busts cached search results on success.
      *
-     * @param  array{room_id: int, checkin_date: string, checkout_date: string, guests: int}  $data
+     * @param  array{room_id: string, checkin_date: string, checkout_date: string, guests: int}  $data
      */
     public function create(array $data): Booking
     {
@@ -61,10 +61,10 @@ class BookingService
         $nights = (int) $checkin->diffInDays($checkout);
 
         $booking = DB::transaction(function () use ($data, $checkin, $checkout, $nights): Booking {
-            $room = $this->rooms->findForUpdate((int) $data['room_id']);
+            $room = $this->rooms->findForUpdate($data['room_id']);
 
             if (! $room instanceof Room) {
-                throw RoomNotAvailableException::forRange((int) $data['room_id'], $checkin->toDateString(), $checkout->toDateString());
+                throw RoomNotAvailableException::forRange($data['room_id'], $checkin->toDateString(), $checkout->toDateString());
             }
 
             $overlapping = $this->bookings->overlappingForRoom(

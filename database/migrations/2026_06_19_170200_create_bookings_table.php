@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bookings', function (Blueprint $table): void {
-            $table->bigIncrements('id');
-            $table->foreignId('room_id')
+            $table->uuid('id')->primary();
+            $table->foreignUuid('room_id')
                 ->constrained()
                 ->cascadeOnDelete()
                 ->index();
@@ -21,7 +21,14 @@ return new class extends Migration
             $table->unsignedSmallInteger('guests');
             $table->string('status')->default('confirmed'); // confirmed | cancelled
             $table->decimal('total_price', 10, 2); // snapshot at booking time
+
+            // Audit trail — stamped automatically by App\Models\AppModel::boot().
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
 
             // Speeds up the date-range overlap queries used to compute availability.
             $table->index(['room_id', 'checkin_date', 'checkout_date'], 'bookings_room_date_range_index');

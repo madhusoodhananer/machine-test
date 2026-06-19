@@ -24,9 +24,7 @@ class AuthController extends Controller
         $user = User::query()->where('email', $credentials['email'])->first();
 
         if ($user === null || ! Hash::check($credentials['password'], $user->password)) {
-            return response()->json([
-                'message' => 'The provided credentials are incorrect.',
-            ], 401);
+            return $this->respondError('The provided credentials are incorrect.', 401);
         }
 
         $token = $user->createToken('api-token')->plainTextToken;
@@ -52,6 +50,6 @@ class AuthController extends Controller
             $token->delete();
         }
 
-        return response()->json(status: 204);
+        return $this->respondNoContent();
     }
 }

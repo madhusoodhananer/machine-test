@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rooms', function (Blueprint $table): void {
-            $table->bigIncrements('id');
-            $table->foreignId('hotel_id')
+            $table->uuid('id')->primary();
+            $table->foreignUuid('hotel_id')
                 ->constrained()
                 ->cascadeOnDelete()
                 ->index();
@@ -22,7 +22,14 @@ return new class extends Migration
             // Total physical inventory of this room type (replaces the static `available_rooms`).
             // Date-range availability is derived from the bookings table, not stored here.
             $table->unsignedSmallInteger('total_rooms');
+
+            // Audit trail — stamped automatically by App\Models\AppModel::boot().
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

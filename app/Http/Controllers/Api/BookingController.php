@@ -23,15 +23,13 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request): JsonResponse
     {
-        /** @var array{room_id: int, checkin_date: string, checkout_date: string, guests: int} $data */
+        /** @var array{room_id: string, checkin_date: string, checkout_date: string, guests: int} $data */
         $data = $request->validated();
 
         try {
             $booking = $this->bookings->create($data);
         } catch (RoomNotAvailableException $exception) {
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return $this->respondError($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return (new BookingResource($booking))
