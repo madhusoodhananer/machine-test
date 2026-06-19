@@ -40,8 +40,7 @@ class EloquentHotelRepository implements HotelRepositoryInterface
                 filled($filters['rating'] ?? null),
                 fn ($query) => $query->where('rating', '>=', (int) $filters['rating']),
             )
-            ->orderByDesc('rating')
-            ->orderBy('name')
+            ->latest() // newest first by created_at (UUID keys are not time-ordered)
             ->paginate($perPage);
     }
 
