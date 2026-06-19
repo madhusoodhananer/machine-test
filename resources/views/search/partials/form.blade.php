@@ -14,15 +14,19 @@
                 </select>
                 @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
+            @php($today = now()->toDateString())
+            @php($tomorrow = now()->addDay()->toDateString())
             <div class="col-md-3">
                 <label class="form-label" for="checkin_date"><i class="bi bi-calendar-event me-1"></i>Check-in</label>
-                <input id="checkin_date" name="checkin_date" type="date" value="{{ $filters['checkin_date'] ?? '' }}"
+                <input id="checkin_date" name="checkin_date" type="date" value="{{ $filters['checkin_date'] ?? $today }}"
+                       min="{{ $today }}"
                        class="form-control @error('checkin_date') is-invalid @enderror">
                 @error('checkin_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-3">
                 <label class="form-label" for="checkout_date"><i class="bi bi-calendar-check me-1"></i>Check-out</label>
-                <input id="checkout_date" name="checkout_date" type="date" value="{{ $filters['checkout_date'] ?? '' }}"
+                <input id="checkout_date" name="checkout_date" type="date" value="{{ $filters['checkout_date'] ?? $tomorrow }}"
+                       min="{{ $tomorrow }}"
                        class="form-control @error('checkout_date') is-invalid @enderror">
                 @error('checkout_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
