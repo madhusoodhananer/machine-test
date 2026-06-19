@@ -14,8 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('room_id')
                 ->constrained()
-                ->cascadeOnDelete()
-                ->index();
+                ->cascadeOnDelete();
             $table->date('checkin_date')->index();
             $table->date('checkout_date')->index();
             $table->unsignedSmallInteger('guests');

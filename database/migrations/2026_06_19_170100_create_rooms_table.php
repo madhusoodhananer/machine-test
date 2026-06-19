@@ -14,8 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('hotel_id')
                 ->constrained()
-                ->cascadeOnDelete()
-                ->index();
+                ->cascadeOnDelete();
             $table->string('name'); // e.g. "Deluxe King"
             $table->decimal('price_per_night', 10, 2);
             $table->unsignedSmallInteger('max_occupancy');
