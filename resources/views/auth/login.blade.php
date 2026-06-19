@@ -32,20 +32,8 @@
                 <span class="hi-logo"><i class="bi bi-buildings-fill"></i></span>
                 <span>Hotel<span class="text-info">Hub</span></span>
             </a>
-            <div>
-                <h1 class="fw-bold mb-4" style="font-size:2rem;">Inventory &amp; availability,<br>beautifully managed.</h1>
-                <div class="hi-feature">
-                    <span class="ic"><i class="bi bi-calendar2-check"></i></span>
-                    <div><div class="fw-semibold">Date-aware availability</div><div class="opacity-75 small">Live per-night counts from real bookings.</div></div>
-                </div>
-                <div class="hi-feature">
-                    <span class="ic"><i class="bi bi-shield-lock"></i></span>
-                    <div><div class="fw-semibold">Secure by design</div><div class="opacity-75 small">Token &amp; session auth, overbooking-safe writes.</div></div>
-                </div>
-                <div class="hi-feature">
-                    <span class="ic"><i class="bi bi-lightning-charge"></i></span>
-                    <div><div class="fw-semibold">Fast search</div><div class="opacity-75 small">Cached results with smart invalidation.</div></div>
-                </div>
+            <div class="text-center">
+                <i class="bi bi-buildings-fill" style="font-size:6rem; opacity:.9;"></i>
             </div>
             <div class="opacity-50 small">© {{ date('Y') }} HotelHub. A technical demo.</div>
         </div>

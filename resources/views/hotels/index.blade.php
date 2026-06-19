@@ -6,10 +6,13 @@
 @section('content')
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
         <form method="GET" action="{{ route('hotels.index') }}" class="d-flex gap-2" style="flex:1 1 340px; max-width:460px;">
-            <div class="hi-search flex-grow-1">
-                <i class="bi bi-search"></i>
-                <input name="city" value="{{ $city }}" class="form-control" placeholder="Filter by city…">
-            </div>
+            <select name="city" data-tomselect
+                    class="form-select flex-grow-1" onchange="this.form.submit()">
+                <option value="">All cities</option>
+                @foreach (config('locations.cities') as $cityOption)
+                    <option value="{{ $cityOption }}" @selected($city === $cityOption)>{{ $cityOption }}</option>
+                @endforeach
+            </select>
             <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Search</button>
         </form>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createHotelModal">
@@ -51,6 +54,7 @@
     @include('hotels.partials.edit-modal')
     @include('hotels.partials.details-modal')
     @include('partials.confirm-delete-modal')
+    @include('partials.tom-select')
 
     @if ($errors->any())
         @push('scripts')
