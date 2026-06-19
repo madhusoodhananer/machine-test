@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoomRequest;
+use App\Models\Room;
 use App\Services\HotelService;
 use App\Services\RoomService;
 use Illuminate\Http\RedirectResponse;
@@ -64,6 +65,24 @@ class RoomController extends Controller
                 ->back()
                 ->withInput()
                 ->with('error', 'We could not create the room. Please try again.');
+        }
+    }
+
+    public function update(StoreRoomRequest $request, Room $room): RedirectResponse
+    {
+        try {
+            $this->rooms->update($room, $request->validated());
+
+            return redirect()
+                ->route('rooms.index')
+                ->with('status', 'Room updated successfully.');
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'We could not update the room. Please try again.');
         }
     }
 }

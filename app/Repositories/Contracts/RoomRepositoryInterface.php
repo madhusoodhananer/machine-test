@@ -14,6 +14,11 @@ interface RoomRepositoryInterface
      */
     public function create(array $attributes): Room;
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function update(Room $room, array $attributes): Room;
+
     public function find(string $id): ?Room;
 
     /**

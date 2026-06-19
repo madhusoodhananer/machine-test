@@ -15,6 +15,13 @@ class EloquentRoomRepository implements RoomRepositoryInterface
         return Room::query()->create($attributes);
     }
 
+    public function update(Room $room, array $attributes): Room
+    {
+        $room->update($attributes);
+
+        return $room;
+    }
+
     public function find(string $id): ?Room
     {
         return Room::query()->find($id);

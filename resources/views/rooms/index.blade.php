@@ -69,10 +69,19 @@
     </div>
 
     @include('rooms.partials.create-modal')
+    @include('rooms.partials.edit-modal')
+    @include('rooms.partials.details-modal')
 
     @if ($errors->any())
         @push('scripts')
-            <script>new bootstrap.Modal(document.getElementById('createRoomModal')).show();</script>
+            <script>
+                (function () {
+                    // Re-open whichever modal was submitted (edit carries an __action URL).
+                    const isEdit = @json((bool) old('__action'));
+                    const id = isEdit ? 'editRoomModal' : 'createRoomModal';
+                    new bootstrap.Modal(document.getElementById(id)).show();
+                })();
+            </script>
         @endpush
     @endif
 @endsection

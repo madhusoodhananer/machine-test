@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
+    Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
 
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 });

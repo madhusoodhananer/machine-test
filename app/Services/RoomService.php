@@ -23,6 +23,14 @@ class RoomService
     }
 
     /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function update(Room $room, array $attributes): Room
+    {
+        return $this->rooms->update($room, $attributes);
+    }
+
+    /**
      * @return LengthAwarePaginator<int, Room>
      */
     public function paginateWithHotel(int $perPage = 15, ?string $hotelId = null, ?string $search = null): LengthAwarePaginator
