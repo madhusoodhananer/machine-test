@@ -25,9 +25,9 @@ class RoomService
     /**
      * @return LengthAwarePaginator<int, Room>
      */
-    public function paginateWithHotel(int $perPage = 15, ?string $hotelId = null): LengthAwarePaginator
+    public function paginateWithHotel(int $perPage = 15, ?string $hotelId = null, ?string $search = null): LengthAwarePaginator
     {
-        return $this->rooms->paginateWithHotel($perPage, $hotelId);
+        return $this->rooms->paginateWithHotel($perPage, $hotelId, $search);
     }
 
     public function count(): int

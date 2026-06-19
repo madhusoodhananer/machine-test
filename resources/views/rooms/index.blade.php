@@ -5,19 +5,34 @@
 
 @section('content')
     @php($activeHotel = ($hotelFilter ?? null) ? $hotels->firstWhere('id', $hotelFilter) : null)
+    @php($hasFilters = ($hotelFilter ?? null) || filled($search ?? null))
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
-        <div>
+        <form method="GET" action="{{ route('rooms.index') }}" class="d-flex gap-2" style="flex:1 1 360px; max-width:480px;">
             @if ($hotelFilter ?? null)
-                <span class="badge text-bg-primary"><i class="bi bi-funnel-fill me-1"></i>Rooms at {{ $activeHotel?->name ?? 'selected hotel' }}</span>
-                <a href="{{ route('rooms.index') }}" class="btn btn-sm btn-link text-decoration-none px-1"><i class="bi bi-x-lg"></i> Clear</a>
-            @else
-                <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Room types and their physical inventory per hotel.</p>
+                <input type="hidden" name="hotel" value="{{ $hotelFilter }}">
             @endif
-        </div>
+            <div class="hi-search flex-grow-1">
+                <i class="bi bi-search"></i>
+                <input name="search" value="{{ $search ?? '' }}" class="form-control" placeholder="Search rooms or hotels…">
+            </div>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i>Search</button>
+        </form>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRoomModal">
             <i class="bi bi-plus-lg me-1"></i> Add room
         </button>
     </div>
+
+    @if ($hasFilters)
+        <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+            @if ($hotelFilter ?? null)
+                <span class="badge text-bg-primary"><i class="bi bi-funnel-fill me-1"></i>Rooms at {{ $activeHotel?->name ?? 'selected hotel' }}</span>
+            @endif
+            @if (filled($search ?? null))
+                <span class="badge text-bg-secondary"><i class="bi bi-search me-1"></i>“{{ $search }}”</span>
+            @endif
+            <a href="{{ route('rooms.index') }}" class="btn btn-sm btn-link text-decoration-none px-1"><i class="bi bi-x-lg"></i> Clear all</a>
+        </div>
+    @endif
 
     <div class="card">
         <div class="table-responsive">
@@ -37,7 +52,11 @@
                     @empty
                         <tr>
                             <td colspan="5">
-                                @include('partials.empty', ['icon' => 'bi-door-closed', 'title' => 'No rooms yet', 'text' => 'Add a room to one of your hotels to get started.'])
+                                @if ($hasFilters)
+                                    @include('partials.empty', ['icon' => 'bi-search', 'title' => 'No matching rooms', 'text' => 'No rooms match your current search or filter.'])
+                                @else
+                                    @include('partials.empty', ['icon' => 'bi-door-closed', 'title' => 'No rooms yet', 'text' => 'Add a room to one of your hotels to get started.'])
+                                @endif
                             </td>
                         </tr>
                     @endforelse

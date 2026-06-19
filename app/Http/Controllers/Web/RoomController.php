@@ -26,12 +26,14 @@ class RoomController extends Controller
     public function index(Request $request): View
     {
         $hotelId = $request->query('hotel');
+        $search = $request->query('search');
 
         try {
             return view('rooms.index', [
-                'rooms' => $this->rooms->paginateWithHotel(self::PER_PAGE, $hotelId)->withQueryString(),
+                'rooms' => $this->rooms->paginateWithHotel(self::PER_PAGE, $hotelId, $search)->withQueryString(),
                 'hotels' => $this->hotels->all(),
                 'hotelFilter' => $hotelId,
+                'search' => $search,
             ]);
         } catch (\Throwable $exception) {
             report($exception);
@@ -42,6 +44,7 @@ class RoomController extends Controller
                 'rooms' => new LengthAwarePaginator([], 0, self::PER_PAGE),
                 'hotels' => collect(),
                 'hotelFilter' => $hotelId,
+                'search' => $search,
             ]);
         }
     }
