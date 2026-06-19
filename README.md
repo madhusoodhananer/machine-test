@@ -345,13 +345,17 @@ Code style:
 
 ## Postman
 
-Import from `postman/`:
+Import both files from the project root:
 
 - `HotelInventory.postman_collection.json`
-- `HotelInventory.postman_environment.json` (vars: `base_url`, `token`)
+- `HotelInventory.postman_environment.json` (vars: `base_url`, `token`, `hotel_id`, `room_id`)
 
-Run **Login** first — its test script saves the token into `{{token}}` for the protected
-requests.
+`base_url` defaults to `http://localhost:8000` (the no-Docker run); change it to
+`http://localhost:8088` if you run via Sail.
+
+Run the requests in order — **Login → Create Hotel → Create Room → Create Booking**. Their
+test scripts capture the returned token and the UUIDs into `{{token}}`, `{{hotel_id}}` and
+`{{room_id}}`, so the chain works without pasting IDs by hand.
 
 ---
 
