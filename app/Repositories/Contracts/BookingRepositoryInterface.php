@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Contracts;
 
 use App\Models\Booking;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface BookingRepositoryInterface
@@ -14,7 +15,20 @@ interface BookingRepositoryInterface
      */
     public function create(array $attributes): Booking;
 
+    /**
+     * Soft-delete a booking.
+     */
+    public function delete(Booking $booking): void;
+
     public function count(): int;
+
+    /**
+     * Paginate bookings, newest first, with their room and hotel eager-loaded
+     * (for the bookings listing page).
+     *
+     * @return LengthAwarePaginator<int, Booking>
+     */
+    public function paginateWithRoomAndHotel(int $perPage): LengthAwarePaginator;
 
     /**
      * Confirmed bookings that overlap [checkin, checkout) for the given rooms,

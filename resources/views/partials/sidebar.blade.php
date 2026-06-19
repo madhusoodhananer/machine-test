@@ -31,7 +31,7 @@
 
     <div class="hi-nav-label">Workspace</div>
     <nav class="hi-nav">
-        <a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal"><i class="bi bi-calendar-check"></i> Bookings</a>
+        <a href="{{ route('bookings.index') }}" class="{{ request()->routeIs('bookings.*') ? 'active' : '' }}"><i class="bi bi-calendar-check"></i> Bookings</a>
         <a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal"><i class="bi bi-graph-up-arrow"></i> Reports</a>
         <a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal"><i class="bi bi-gear-fill"></i> Settings</a>
     </nav>

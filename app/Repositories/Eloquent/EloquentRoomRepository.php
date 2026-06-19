@@ -7,6 +7,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Room;
 use App\Repositories\Contracts\RoomRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class EloquentRoomRepository implements RoomRepositoryInterface
 {
@@ -46,6 +47,14 @@ class EloquentRoomRepository implements RoomRepositoryInterface
             })
             ->latest() // newest first by created_at (UUID keys are not time-ordered)
             ->paginate($perPage);
+    }
+
+    public function allWithHotel(): Collection
+    {
+        return Room::query()
+            ->with('hotel')
+            ->orderBy('name')
+            ->get();
     }
 
     public function count(): int

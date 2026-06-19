@@ -6,6 +6,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Booking;
 use App\Repositories\Contracts\BookingRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -16,9 +17,22 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         return Booking::query()->create($attributes);
     }
 
+    public function delete(Booking $booking): void
+    {
+        $booking->delete();
+    }
+
     public function count(): int
     {
         return Booking::query()->count();
+    }
+
+    public function paginateWithRoomAndHotel(int $perPage): LengthAwarePaginator
+    {
+        return Booking::query()
+            ->with('room.hotel')
+            ->latest('created_at')
+            ->paginate($perPage);
     }
 
     public function overlappingForRooms(array $roomIds, string $checkin, string $checkout): Collection

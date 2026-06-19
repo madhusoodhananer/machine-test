@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Repositories\Contracts\BookingRepositoryInterface;
 use App\Repositories\Contracts\RoomRepositoryInterface;
 use App\Services\Search\SearchResultCache;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,25 @@ class BookingService
         private readonly RoomRepositoryInterface $rooms,
         private readonly SearchResultCache $searchCache,
     ) {}
+
+    /**
+     * @return LengthAwarePaginator<int, Booking>
+     */
+    public function paginate(int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->bookings->paginateWithRoomAndHotel($perPage);
+    }
+
+    /**
+     * Soft-delete a booking and bust cached search results, since cancelling
+     * a booking frees the room for those dates.
+     */
+    public function delete(Booking $booking): void
+    {
+        $this->bookings->delete($booking);
+
+        $this->searchCache->bump();
+    }
 
     /**
      * Available units of a room for the half-open range [checkin, checkout).

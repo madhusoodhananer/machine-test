@@ -6,6 +6,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Room;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface RoomRepositoryInterface
 {
@@ -35,6 +36,13 @@ interface RoomRepositoryInterface
      * @return LengthAwarePaginator<int, Room>
      */
     public function paginateWithHotel(int $perPage, ?string $hotelId = null, ?string $search = null): LengthAwarePaginator;
+
+    /**
+     * All rooms with their hotel eager-loaded, for selection dropdowns.
+     *
+     * @return Collection<int, Room>
+     */
+    public function allWithHotel(): Collection;
 
     public function count(): int;
 }
