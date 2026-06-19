@@ -44,6 +44,7 @@
 
     @include('bookings.partials.create-modal')
     @include('bookings.partials.delete-modal')
+    @include('partials.tom-select')
 
     @if ($errors->any())
         @push('scripts')

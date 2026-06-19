@@ -14,7 +14,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label" for="hotel_id">Hotel</label>
-                        <select id="hotel_id" name="hotel_id" class="form-select @error('hotel_id') is-invalid @enderror">
+                        <select id="hotel_id" name="hotel_id" data-tomselect class="form-select @error('hotel_id') is-invalid @enderror">
                             <option value="">Choose a hotel…</option>
                             @foreach ($hotels as $hotel)
                                 <option value="{{ $hotel->id }}" @selected(old('hotel_id') === $hotel->id)>

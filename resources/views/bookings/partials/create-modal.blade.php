@@ -14,7 +14,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label" for="booking_room_id">Room</label>
-                        <select id="booking_room_id" name="room_id" class="form-select @error('room_id') is-invalid @enderror">
+                        <select id="booking_room_id" name="room_id" data-tomselect class="form-select @error('room_id') is-invalid @enderror">
                             <option value="">Choose a room…</option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}" @selected(old('room_id') === $room->id)>
@@ -56,31 +56,3 @@
         </div>
     </div>
 </div>
-
-@push('styles')
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-<style>
-    .ts-control { border-radius: 10px; border-color: var(--hi-border); padding: .5rem .8rem; }
-    .ts-control.focus { border-color: var(--hi-primary); box-shadow: 0 0 0 .2rem rgba(79, 70, 229, .12); }
-    .ts-dropdown { border-radius: 12px; border-color: var(--hi-border); box-shadow: var(--hi-shadow); overflow: hidden; }
-    .ts-dropdown .active { background: rgba(79, 70, 229, .1); color: var(--hi-primary); }
-    .ts-dropdown .ts-dropdown-content { max-height: 260px; }
-</style>
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
-<script>
-    (function () {
-        const select = document.getElementById('booking_room_id');
-        if (!select || !window.TomSelect || select.tomselect) return;
-        new TomSelect(select, {
-            create: false,
-            allowEmptyOption: true,
-            placeholder: 'Search a hotel or room…',
-            searchField: ['text'],
-            maxOptions: null,
-        });
-    })();
-</script>
-@endpush

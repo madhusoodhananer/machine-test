@@ -19,7 +19,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label" for="edit_room_hotel_id">Hotel</label>
-                        <select id="edit_room_hotel_id" name="hotel_id" class="form-select @error('hotel_id') is-invalid @enderror">
+                        <select id="edit_room_hotel_id" name="hotel_id" data-tomselect class="form-select @error('hotel_id') is-invalid @enderror">
                             <option value="">Choose a hotel…</option>
                             @foreach ($hotels as $hotel)
                                 <option value="{{ $hotel->id }}" @selected(old('hotel_id') === $hotel->id)>
@@ -81,7 +81,13 @@
             const action = d.action || '';
             form.setAttribute('action', action);
             modal.querySelector('input[name="__action"]').value = action;
-            modal.querySelector('#edit_room_hotel_id').value = d.hotelId || '';
+            const hotelSelect = modal.querySelector('#edit_room_hotel_id');
+            // Sync via the Tom Select instance when present, else the native select.
+            if (hotelSelect.tomselect) {
+                hotelSelect.tomselect.setValue(d.hotelId || '', true);
+            } else {
+                hotelSelect.value = d.hotelId || '';
+            }
             modal.querySelector('#edit_room_name').value = d.name || '';
             modal.querySelector('#edit_room_price').value = d.price || '';
             modal.querySelector('#edit_room_occupancy').value = d.occupancy || '';

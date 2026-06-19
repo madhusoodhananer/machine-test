@@ -72,6 +72,7 @@
     @include('rooms.partials.edit-modal')
     @include('rooms.partials.details-modal')
     @include('partials.confirm-delete-modal')
+    @include('partials.tom-select')
 
     @if ($errors->any())
         @push('scripts')
