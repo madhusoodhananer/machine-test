@@ -5,7 +5,7 @@
             <div class="col-md-4">
                 <label class="form-label" for="city"><i class="bi bi-geo-alt me-1"></i>City</label>
                 @php($selectedCity = $filters['city'] ?? '')
-                <select id="city" name="city" class="form-select @error('city') is-invalid @enderror">
+                <select id="city" name="city" data-tomselect class="form-select @error('city') is-invalid @enderror">
                     <option value="">Choose a city…</option>
                     @php($cityOptions = collect(config('locations.cities'))->push($selectedCity)->filter()->unique())
                     @foreach ($cityOptions as $cityOption)

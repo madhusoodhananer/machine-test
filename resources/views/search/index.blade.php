@@ -31,4 +31,6 @@
             </div>
         @endforelse
     @endif
+
+    @include('partials.tom-select')
 @endsection
