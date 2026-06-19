@@ -21,7 +21,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="city">City</label>
-                            <select id="city" name="city" class="form-select @error('city') is-invalid @enderror">
+                            <select id="city" name="city" data-tomselect class="form-select @error('city') is-invalid @enderror">
                                 <option value="">Choose a city…</option>
                                 @foreach (config('locations.cities') as $cityOption)
                                     <option value="{{ $cityOption }}" @selected(old('city') === $cityOption)>{{ $cityOption }}</option>
@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="country">Country</label>
-                            <select id="country" name="country" class="form-select @error('country') is-invalid @enderror">
+                            <select id="country" name="country" data-tomselect class="form-select @error('country') is-invalid @enderror">
                                 <option value="">Choose a country…</option>
                                 @foreach (config('locations.countries') as $countryOption)
                                     <option value="{{ $countryOption }}" @selected(old('country') === $countryOption)>{{ $countryOption }}</option>
@@ -42,7 +42,7 @@
                     </div>
                     <div class="mt-3">
                         <label class="form-label" for="rating">Star rating</label>
-                        <select id="rating" name="rating" class="form-select @error('rating') is-invalid @enderror">
+                        <select id="rating" name="rating" data-tomselect class="form-select @error('rating') is-invalid @enderror">
                             <option value="">Choose…</option>
                             @for ($i = 1; $i <= 5; $i++)
                                 <option value="{{ $i }}" @selected((int) old('rating') === $i)>{{ str_repeat('★', $i) }} ({{ $i }})</option>
