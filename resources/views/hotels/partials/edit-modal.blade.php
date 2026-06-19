@@ -26,14 +26,22 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="edit_city">City</label>
-                            <input id="edit_city" name="city" value="{{ old('city') }}"
-                                   class="form-control @error('city') is-invalid @enderror">
+                            <select id="edit_city" name="city" class="form-select @error('city') is-invalid @enderror">
+                                <option value="">Choose a city…</option>
+                                @foreach (config('locations.cities') as $cityOption)
+                                    <option value="{{ $cityOption }}" @selected(old('city') === $cityOption)>{{ $cityOption }}</option>
+                                @endforeach
+                            </select>
                             @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="edit_country">Country</label>
-                            <input id="edit_country" name="country" value="{{ old('country') }}"
-                                   class="form-control @error('country') is-invalid @enderror">
+                            <select id="edit_country" name="country" class="form-select @error('country') is-invalid @enderror">
+                                <option value="">Choose a country…</option>
+                                @foreach (config('locations.countries') as $countryOption)
+                                    <option value="{{ $countryOption }}" @selected(old('country') === $countryOption)>{{ $countryOption }}</option>
+                                @endforeach
+                            </select>
                             @error('country')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
@@ -71,8 +79,16 @@
             form.setAttribute('action', action);
             modal.querySelector('input[name="__action"]').value = action;
             modal.querySelector('#edit_name').value = d.name || '';
-            modal.querySelector('#edit_city').value = d.city || '';
-            modal.querySelector('#edit_country').value = d.country || '';
+            // Select the current value, adding it as an option if it isn't a canonical one.
+            const selectValue = (select, value) => {
+                if (!select) return;
+                if (value && ![...select.options].some(o => o.value === value)) {
+                    select.add(new Option(value, value));
+                }
+                select.value = value || '';
+            };
+            selectValue(modal.querySelector('#edit_city'), d.city);
+            selectValue(modal.querySelector('#edit_country'), d.country);
             modal.querySelector('#edit_rating').value = d.rating || '';
         });
     })();

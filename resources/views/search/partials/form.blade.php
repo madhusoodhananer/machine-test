@@ -4,8 +4,14 @@
         <form method="GET" action="{{ route('search.index') }}" class="row g-3" novalidate>
             <div class="col-md-4">
                 <label class="form-label" for="city"><i class="bi bi-geo-alt me-1"></i>City</label>
-                <input id="city" name="city" value="{{ $filters['city'] ?? '' }}" placeholder="Dubai"
-                       class="form-control @error('city') is-invalid @enderror">
+                @php($selectedCity = $filters['city'] ?? '')
+                <select id="city" name="city" class="form-select @error('city') is-invalid @enderror">
+                    <option value="">Choose a city…</option>
+                    @php($cityOptions = collect(config('locations.cities'))->push($selectedCity)->filter()->unique())
+                    @foreach ($cityOptions as $cityOption)
+                        <option value="{{ $cityOption }}" @selected($selectedCity === $cityOption)>{{ $cityOption }}</option>
+                    @endforeach
+                </select>
                 @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-3">

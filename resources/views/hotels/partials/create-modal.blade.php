@@ -21,14 +21,22 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="city">City</label>
-                            <input id="city" name="city" value="{{ old('city') }}" placeholder="Dubai"
-                                   class="form-control @error('city') is-invalid @enderror">
+                            <select id="city" name="city" class="form-select @error('city') is-invalid @enderror">
+                                <option value="">Choose a city…</option>
+                                @foreach (config('locations.cities') as $cityOption)
+                                    <option value="{{ $cityOption }}" @selected(old('city') === $cityOption)>{{ $cityOption }}</option>
+                                @endforeach
+                            </select>
                             @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="country">Country</label>
-                            <input id="country" name="country" value="{{ old('country') }}" placeholder="United Arab Emirates"
-                                   class="form-control @error('country') is-invalid @enderror">
+                            <select id="country" name="country" class="form-select @error('country') is-invalid @enderror">
+                                <option value="">Choose a country…</option>
+                                @foreach (config('locations.countries') as $countryOption)
+                                    <option value="{{ $countryOption }}" @selected(old('country') === $countryOption)>{{ $countryOption }}</option>
+                                @endforeach
+                            </select>
                             @error('country')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
