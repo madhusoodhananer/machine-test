@@ -25,10 +25,11 @@ class EloquentRoomRepository implements RoomRepositoryInterface
         return Room::query()->lockForUpdate()->find($id);
     }
 
-    public function paginateWithHotel(int $perPage): LengthAwarePaginator
+    public function paginateWithHotel(int $perPage, ?string $hotelId = null): LengthAwarePaginator
     {
         return Room::query()
             ->with('hotel')
+            ->when(filled($hotelId), fn ($query) => $query->where('hotel_id', $hotelId))
             ->latest() // newest first by created_at (UUID keys are not time-ordered)
             ->paginate($perPage);
     }

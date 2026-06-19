@@ -45,10 +45,19 @@
     </div>
 
     @include('hotels.partials.create-modal')
+    @include('hotels.partials.edit-modal')
+    @include('hotels.partials.details-modal')
 
     @if ($errors->any())
         @push('scripts')
-            <script>new bootstrap.Modal(document.getElementById('createHotelModal')).show();</script>
+            <script>
+                (function () {
+                    // Re-open whichever modal was submitted (edit carries an __action URL).
+                    const isEdit = @json((bool) old('__action'));
+                    const id = isEdit ? 'editHotelModal' : 'createHotelModal';
+                    new bootstrap.Modal(document.getElementById(id)).show();
+                })();
+            </script>
         @endpush
     @endif
 @endsection

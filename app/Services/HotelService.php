@@ -24,6 +24,14 @@ class HotelService
     }
 
     /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function update(Hotel $hotel, array $attributes): Hotel
+    {
+        return $this->hotels->update($hotel, $attributes);
+    }
+
+    /**
      * @param  array{city?: string|null, rating?: int|null}  $filters
      * @return LengthAwarePaginator<int, Hotel>
      */

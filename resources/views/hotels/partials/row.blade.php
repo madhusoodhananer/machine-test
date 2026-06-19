@@ -2,6 +2,7 @@
 @php
     $palette = ['hi-grad-indigo', 'hi-grad-emerald', 'hi-grad-sky', 'hi-grad-amber', 'hi-grad-rose'];
     $chip = $palette[abs(crc32((string) $hotel->id)) % count($palette)];
+    $roomsUrl = route('rooms.index', ['hotel' => $hotel->id]);
 @endphp
 <tr>
     <td>
@@ -19,7 +20,39 @@
     </td>
     <td><span class="badge text-bg-light"><i class="bi bi-door-open me-1"></i>{{ $hotel->rooms_count }} rooms</span></td>
     <td class="text-end">
-        <a href="{{ route('rooms.index') }}" class="btn btn-sm btn-outline-secondary" title="View rooms"><i class="bi bi-door-open"></i></a>
-        <button class="btn btn-sm btn-outline-secondary" title="More" data-bs-toggle="modal" data-bs-target="#comingSoonModal"><i class="bi bi-three-dots"></i></button>
+        <a href="{{ $roomsUrl }}" class="btn btn-sm btn-outline-secondary" title="View rooms"><i class="bi bi-door-open"></i></a>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="More actions">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius:12px;">
+                <li>
+                    <button type="button" class="dropdown-item hi-hotel-details"
+                            data-bs-toggle="modal" data-bs-target="#hotelDetailsModal"
+                            data-id="{{ $hotel->id }}"
+                            data-name="{{ $hotel->name }}"
+                            data-city="{{ $hotel->city }}"
+                            data-country="{{ $hotel->country }}"
+                            data-rating="{{ $hotel->rating }}"
+                            data-rooms="{{ $hotel->rooms_count }}"
+                            data-rooms-url="{{ $roomsUrl }}">
+                        <i class="bi bi-info-circle me-2"></i>View details
+                    </button>
+                </li>
+                <li><a class="dropdown-item" href="{{ $roomsUrl }}"><i class="bi bi-door-open me-2"></i>View rooms</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <button type="button" class="dropdown-item hi-hotel-edit"
+                            data-bs-toggle="modal" data-bs-target="#editHotelModal"
+                            data-action="{{ route('hotels.update', $hotel->id) }}"
+                            data-name="{{ $hotel->name }}"
+                            data-city="{{ $hotel->city }}"
+                            data-country="{{ $hotel->country }}"
+                            data-rating="{{ $hotel->rating }}">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </button>
+                </li>
+            </ul>
+        </div>
     </td>
 </tr>

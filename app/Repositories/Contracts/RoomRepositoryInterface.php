@@ -24,10 +24,11 @@ interface RoomRepositoryInterface
 
     /**
      * Paginate rooms with their hotel eager-loaded (for the rooms listing page).
+     * Optionally restrict to a single hotel.
      *
      * @return LengthAwarePaginator<int, Room>
      */
-    public function paginateWithHotel(int $perPage): LengthAwarePaginator;
+    public function paginateWithHotel(int $perPage, ?string $hotelId = null): LengthAwarePaginator;
 
     public function count(): int;
 }

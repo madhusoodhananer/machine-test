@@ -16,6 +16,13 @@ class EloquentHotelRepository implements HotelRepositoryInterface
         return Hotel::query()->create($attributes);
     }
 
+    public function update(Hotel $hotel, array $attributes): Hotel
+    {
+        $hotel->update($attributes);
+
+        return $hotel;
+    }
+
     public function paginate(array $filters, int $perPage): LengthAwarePaginator
     {
         return Hotel::query()

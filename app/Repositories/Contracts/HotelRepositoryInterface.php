@@ -16,6 +16,11 @@ interface HotelRepositoryInterface
     public function create(array $attributes): Hotel;
 
     /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function update(Hotel $hotel, array $attributes): Hotel;
+
+    /**
      * Paginate hotels applying optional filters.
      *
      * @param  array{city?: string|null, rating?: int|null}  $filters

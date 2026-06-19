@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/hotels', [HotelController::class, 'index'])->name('hotels.index');
     Route::post('/hotels', [HotelController::class, 'store'])->name('hotels.store');
+    Route::put('/hotels/{hotel}', [HotelController::class, 'update'])->name('hotels.update');
 
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');

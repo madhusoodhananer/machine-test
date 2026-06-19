@@ -9,22 +9,29 @@ use App\Http\Requests\StoreRoomRequest;
 use App\Services\HotelService;
 use App\Services\RoomService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class RoomController extends Controller
 {
+    /** Rooms shown per page in the list. */
+    private const PER_PAGE = 10;
+
     public function __construct(
         private readonly RoomService $rooms,
         private readonly HotelService $hotels,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $hotelId = $request->query('hotel');
+
         try {
             return view('rooms.index', [
-                'rooms' => $this->rooms->paginateWithHotel(10),
+                'rooms' => $this->rooms->paginateWithHotel(self::PER_PAGE, $hotelId)->withQueryString(),
                 'hotels' => $this->hotels->all(),
+                'hotelFilter' => $hotelId,
             ]);
         } catch (\Throwable $exception) {
             report($exception);
@@ -32,8 +39,9 @@ class RoomController extends Controller
             session()->now('error', 'We could not load the rooms list.');
 
             return view('rooms.index', [
-                'rooms' => new LengthAwarePaginator([], 0, 10),
+                'rooms' => new LengthAwarePaginator([], 0, self::PER_PAGE),
                 'hotels' => collect(),
+                'hotelFilter' => $hotelId,
             ]);
         }
     }
